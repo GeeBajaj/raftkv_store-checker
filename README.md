@@ -3,7 +3,7 @@
 Raft-replicated key-value store, build to be brozen by a linearizaibility checker and to have every failure
 replay exactly from a seed.
 
-- `raft/` pure state machine, no goroutines or clocks or disk or network interactions.
+- `raft/` pure state machine, no I/O.
 Takes in events, returns actions
 
 - driver to perform actions
