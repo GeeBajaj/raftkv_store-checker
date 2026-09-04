@@ -39,9 +39,9 @@ func (r Role) String() string {
 // Data is []byte and opaque to this package
 // Consensus layer mustn know what a command menas:
 type LogEntry struct {
-	Term Term `json:"term"`
-	Index Index `json:"index"`
-	Data []byte `json:"data,omitempty"`
+	Term  Term   `json:"term"`
+	Index Index  `json:"index"`
+	Data  []byte `json:"data,omitempty"`
 }
 
 // --------------------
@@ -58,33 +58,33 @@ type PayLoad interface {
 }
 
 type Message struct {
-	From NodeID `json:"from"`
-	To NodeId `json:"to"`
-	PayLoad Payloard `json:"payload`
+	From    NodeID  `json:"from"`
+	To      NodeID  `json:"to"`
+	PayLoad PayLoad `json:"payload`
 }
 
 type RequestVoteReq struct {
-	Term Term `json:"term"`
-	CandidateID NodeID `json:"candidate_id"`
-	LastLogIndex Index `json:"last_log_index"`
+	Term         Term   `json:"term"`
+	CandidateID  NodeID `json:"candidate_id"`
+	LastLogIndex Index  `json:"last_log_index"`
 }
 
 type RequestVoteResp struct {
-	Term Term `json:"term"`
+	Term        Term `json:"term"`
 	VoteGranted bool `json:"vote_granted"`
 }
 
 type AppendEntriesReq struct {
-	Term Term `json:"term"`
-	LeaderID NodeID `json:"leader_id"`
-	PrevLogIndex Index `json:"prev_log_index"`
-	PrevLogTerm Term `json:"prev_log_term"`
-	Entries []LogEntry `json:"entries,omitempty"`
-	LeaderCommit Index `json:"leader_commit"`
+	Term         Term       `json:"term"`
+	LeaderID     NodeID     `json:"leader_id"`
+	PrevLogIndex Index      `json:"prev_log_index"`
+	PrevLogTerm  Term       `json:"prev_log_term"`
+	Entries      []LogEntry `json:"entries,omitempty"`
+	LeaderCommit Index      `json:"leader_commit"`
 }
 
 type AppendEntriesResp struct {
-	Term Term `json:"term"`
+	Term    Term `json:"term"`
 	Success bool `json:"success"`
 
 	// MatchIndex is the highest index the follower now has that agrees with the leader
@@ -95,13 +95,13 @@ type AppendEntriesResp struct {
 	// paper's recovery decrements nextIndex by one per round trip
 	// After a long partition, the cluster looks hung to a client
 	// which shows up in the failure matrix as an availability
-	// bug instead of slow backup. 
+	// bug instead of slow backup.
 	// The hint lets leader skip an entire term per round trip. (5.3)
 	ConflictIndex Index `json:"conflict_index"`
-	ConflictTerm Term `json:"conflict_term"`
+	ConflictTerm  Term  `json:"conflict_term"`
 }
 
-func(*RequestVoteReq) isPayload() {}
-func(*RequestVoteResp) isPayload() {}
-func(*AppendEntriesReq) isPayload() {}
-func(*AppendEntriesResp) isPayload() {}
+func (*RequestVoteReq) isPayload()    {}
+func (*RequestVoteResp) isPayload()   {}
+func (*AppendEntriesReq) isPayload()  {}
+func (*AppendEntriesResp) isPayload() {}

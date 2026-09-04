@@ -16,17 +16,13 @@ here and only here.
 */
 
 type Log struct {
-	entries[] LogEntry
+	entries []LogEntry
 }
 
 // entries[0] is the sen
 // entries[i].Index == Index(i)
 func NewLog() *Log {
-	return &Log{entries: []LogEntry{
-		{Term: 0,
-		Index: 0
-		}
-	}}
+	return &Log{entries: []LogEntry{{Term: 0, Index: 0}}}
 }
 
 // NewLogFrom rebuilds a log after a restarted.
@@ -36,11 +32,11 @@ func NewLogFrom(persisted []LogEntry) *Log {
 	return l
 }
 
-func (l *Log) LastIndex Index { return l.entries[len(l.entries) - 1].Index}
+func (l *Log) LastIndex() Index { return l.entries[len(l.entries)-1].Index }
 
-func(l *Log) LastTerm() Term { return l.entries[len(l.entries) - 1].Term}
+func (l *Log) LastTerm() Term { return l.entries[len(l.entries)-1].Term }
 
-// TermAt returns the term at the entry at i, or (0, false) if i 
+// TermAt returns the term at the entry at i, or (0, false) if i
 // is beyond the end of the log
 func (l *Log) TermAt(i Index) (Term, bool) {
 	if i > l.LastIndex() {
@@ -52,26 +48,26 @@ func (l *Log) TermAt(i Index) (Term, bool) {
 func (l *Log) At(i Index) LogEntry { return l.entries[i] }
 
 // Returns entries [from, LastIndex()], sharing no backing array with the log
-func (l* Log) Slice(from Index) []LogEntry {
+func (l *Log) Slice(from Index) []LogEntry {
 	if from > l.LastIndex() {
 		return nil
 	}
-	out := make([]LogEntry, 0, l.LastIndex() - from + 1))
-	return append(out, l.entries[from:]...)	
+	out := make([]LogEntry, 0, l.LastIndex()-from+1)
+	return append(out, l.entries[from:]...)
 }
 
 // Implements the AppendEntries consistency check:
 // does this log contain an entry at prevIndex whose term is prevTerm
-func (l* Log) Matches(prevIndex Index, prevTerm Term) bool {
+func (l *Log) Matches(prevIndex Index, prevTerm Term) bool {
 	t, ok := l.TermAt(prevIndex)
 	return ok && t == prevTerm
 }
 
 // implements: is the candidate's log at least as up to date as ours?
 // compares last term, then length
-func (l* Log) IsUpToDate(candLastIndex Index, candLastTerm Term) bool {
-	l_term = l.LastTerm()
-	if candLastTerm != l_term { 
+func (l *Log) IsUpToDate(candLastIndex Index, candLastTerm Term) bool {
+	l_term := l.LastTerm()
+	if candLastTerm != l_term {
 		return candLastTerm > l_term
 	}
 	return candLastIndex >= l.LastIndex()
@@ -79,7 +75,7 @@ func (l* Log) IsUpToDate(candLastIndex Index, candLastTerm Term) bool {
 
 // Adds entries to the end
 // Callers must have already resolved conflicts via TruncateFrom
-func(l *Log) Append(entries ...LogEntry) {
+func (l *Log) Append(entries ...LogEntry) {
 	// TODO: assign Index if zero, or verify contiguity. and assert
 	panic("not implemented")
 }
@@ -94,25 +90,25 @@ func (l *Log) TruncateFrom(i Index) {
 
 // produce ConflictIndex/ConflictTerm hint for a rejected AppendEntries
 // so the leader can back up by a term per round trip
-// instead of per entry. 
+// instead of per entry.
 // if log is too short: return  (lastindex + 1, 0)
 // if entry at prevIndex with wrong term, return the first index of that wrong term and the term
-func(l *Log) FindConflict(prevIndex Index) (Index, Term) {
+func (l *Log) FindConflict(prevIndex Index) (Index, Term) {
 	panic("not implemented")
 }
 
 // return last index whose entry has the given term
-// used by the leader to interpret a conflic hint. 
+// used by the leader to interpret a conflic hint.
 // ret 0, false if absent
-func(l* Log) LastIndexOfTerm(t Term) (Index, bool) {
+func (l *Log) LastIndexOfTerm(t Term) (Index, bool) {
 	panic("not implemented")
 }
 
 // Check that position == index
 // any off by one bugs should be caught herew
 func (l *Log) assert() {
-	for i, e, := range l.entries {
-		if e.Index != Index(i){
+	for i, e := range l.entries {
+		if e.Index != Index(i) {
 			panic(fmt.Sprintf("log corrupt: entries[%d].Index == %d", i, e.Index))
 		}
 	}
